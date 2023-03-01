@@ -1,91 +1,34 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>My Presentation</title>
-  </head>
-  <body>
-      <!-- controller.html -->
-    <button id="presentBtn" style="display: none;">Present</button>
-    <button id="reconnectBtn" style="display: none;">Reconnect</button>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p>Hesso!!</p>
 
-    
-    <!-- button availability script -->
-    <script>
-      // The Present button is visible if at least one presentation display is available
-      var presentBtn = document.getElementById("presentBtn");
-      // It is also possible to use relative presentation URL e.g. "presentation.html"
-      var presUrls = ["https://xeon-zolt.github.io/"]; //can add more url here
-      // show or hide present button depending on display availability
-      var handleAvailabilityChange = function(available) {
-        presentBtn.style.display = available ? "inline" : "none";
-      };
-      // Promise is resolved as soon as the presentation display availability is
-      // known.
-      var request = new PresentationRequest(presUrls);
-      localStorage["presId"] = request.id;
-      console.log(localStorage["presId"])
-      request.getAvailability().then(function(availability) {
-        // availability.value may be kept up-to-date by the controlling UA as long
-        // as the availability object is alive. It is advised for the Web developers
-        // to discard the object as soon as it's not needed.
-        handleAvailabilityChange(availability.value);
-        availability.onchange = function() { handleAvailabilityChange(this.value); };
-      }).catch(function() {
-        // Availability monitoring is not supported by the platform, so discovery of
-        // presentation displays will happen only after request.start() is called.
-        // Pretend the devices are available for simplicity; or, one could implement
-        // a third state for the button.
-        handleAvailabilityChange(true);
-      });
-    </script>
-
-    <!-- reconnect button logic -->
-    <script>
-      var reconnect = function () {
-        // read presId from localStorage if exists
-        var presId = localStorage["presId"];
-        console.log(presId)
-        // presId is mandatory when reconnecting to a presentation.
-        if (!!presId) {
-          request.reconnect(presId)
-            // The new connection to the presentation will be passed to
-            // setConnection on success.
-            .then(setConnection);
-            // No connection found for presUrl and presId, or an error occurred.
+    <h1 id="root"></h1>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', ()=>{
+        if(navigator.presentation.receiver){
+            navigator.presentation.receiver.connectionList.then(list=>{
+                list.connections.map(connection => ()=>{
+                    connection.addEventListener('message', (event)=>{
+                        console.log(event.data);
+                        document.querySelector('#root').textContent = event.data;
+                    })
+                })
+                list.addEventListener('connectionavailable', (event)=>{
+                    event.connection.addEventListener('message', (e)=>{
+                        console.log(e.data);
+                        document.querySelector('#root').textContent = e.data;
+                    })
+                })
+            })
         }
-      };
-      // On navigation of the controller, reconnect automatically.
-      document.addEventListener("DOMContentLoaded", reconnect);
-      // Or allow manual reconnection.
-      const reconnectBtn = document.querySelector("#reconnectBtn");
-      reconnectBtn.onclick = reconnect;
-    </script>
-
-
-    <!-- <script>
-      // Monitor the connection state
-    request.onconnect = _ => {
-      showConnectedUI();
-    </script> -->
-
-    <script>
-      // navigator.presentation.defaultRequest = new PresentationRequest(presUrls);
-      // navigator.presentation.defaultRequest.onconnectionavailable = function(evt) {
-      //   setConnection(evt.connection);
-      // };
-    </script>
-
-    <script>
-      presentBtn.onclick = function () {
-        // Start new presentation.
-        request.start()
-          // The connection to the presentation will be passed to setConnection on
-          // success.
-          .then(setConnection);
-          // Otherwise, the user canceled the selection dialog or no screens were
-          // found.
-      };
-    </script>
-
-  </body>
+    })
+</script>
 </html>
