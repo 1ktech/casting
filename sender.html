@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button id="start">Start</button>
+    <button id="sendMessage">Send Message</button>
+    <button id="reconnect">Reconnect</button>
+    <button id="terminate">Terminate</button>
+</body>
+<script>
+    const presentationRequest = new PresentationRequest('receiver/receiver.html');
+    navigator.presentation.defaultRequest = presentationRequest;
+
+    let presentationConnection;
+
+    document.querySelector('#start').addEventListener('click', ()=>{
+        presentationRequest.start().then(connection => {
+            console.log('connection started', connection.id);
+        })
+        .catch(error => {
+            console.log('error', error.name, error.message);
+        })
+    })
+
+    presentationRequest.addEventListener('connectionavailable', ()=>{
+        presentationConnection = event.connection;
+        presentationConnection.addEventListener('close', ()=>{
+            console.log('closed');
+        })
+
+        presentationConnection.addEventListener('terminate', ()=>{
+            console.log('terminated');
+        })
+
+        presentationConnection.addEventListener('message', (event)=>{
+            console.log('message', event.data);
+        })
+    })
+
+    document.querySelector('#sendMessage').addEventListener('click', ()=>{
+        presentationConnection.send("Hello World!")
+    })
+
+
+    presentationRequest.getAvailability().then(availability => {
+        console.log(availability.value, 'availability');
+    }).catch(console.log("error"))
+
+</script>
+</html>
