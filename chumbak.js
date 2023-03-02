@@ -65,6 +65,11 @@ const getPresentationRequest = (url)=>{
 
 // }
 
+//send template to presentation
+const displayContent = (template)=>{
+    presentationConnection.send(template)
+}
+
 //receiver page
 
 const displayHandler = ()=>{
@@ -74,13 +79,13 @@ const displayHandler = ()=>{
                 list.connections.map(connection => ()=>{
                     connection.addEventListener('message', (event)=>{
                         console.log(event.data);
-                        document.querySelector('#root').textContent = event.data;
+                        document.querySelector('#root').innerHTML = event.data;
                     })
                 })
                 list.addEventListener('connectionavailable', (event)=>{
                     event.connection.addEventListener('message', (e)=>{
                         console.log(e.data);
-                        document.querySelector('#root').textContent = e.data;
+                        document.querySelector('#root').innerHTML = e.data;
                     })
                 })
             })
@@ -92,5 +97,6 @@ export {
     getTemplate,
     startPresentation,
     getPresentationRequest,
-    displayHandler
+    displayHandler,
+    displayContent
 }                               
