@@ -57,17 +57,17 @@ const getPresentationRequest = (url)=>{
     return presentationRequest;
 } 
 
-// const closePresentation = ()=>{
-
-// }
+const closePresentation = ()=>{
+    presentationConnection.send(null);
+}
 
 // const terminatePresentation = ()=>{
-
+//     presentationConnection.send(template);
 // }
 
 //send template to presentation
 const displayContent = (template)=>{
-    presentationConnection.send(template)
+    presentationConnection.send(template);
 }
 
 //receiver page
@@ -98,5 +98,7 @@ export {
     startPresentation,
     getPresentationRequest,
     displayHandler,
-    displayContent
+    displayContent,
+    closePresentation,
+    closePresentation
 }                               
